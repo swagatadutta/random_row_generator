@@ -47,7 +47,7 @@ object VerblobDevRandomRowGenerator {
     implicit val sqlContext: SQLContext = spark.sqlContext
 
     val schema = StructType(List(
-      StructField("dev", StringType, nullable = true),
+      StructField("imei", StringType, nullable = true),
       StructField("verblobid", StringType, nullable = true),
       StructField("model_name", StringType, nullable = true),
       StructField("android_version", StringType, nullable = true),
@@ -73,8 +73,8 @@ object VerblobDevRandomRowGenerator {
       StructField("v24", StringType, nullable = true)
     ))
 
-    val rdd = if (with_nulls == "true") spark.sparkContext.parallelize(0 until totalRows.toInt, numPartitions).map(dummyGeneratorWithNulls)
-                                   else spark.sparkContext.parallelize(0 until totalRows.toInt, numPartitions).map(dummyGenerator)
+    val rdd = if (with_nulls == "true") spark.sparkContext.parallelize(1L until totalRows, numPartitions).map(dummyGeneratorWithNulls)
+                                   else spark.sparkContext.parallelize(1L until totalRows, numPartitions).map(dummyGenerator)
 
     val df = spark.createDataFrame(rdd, schema)
 
@@ -85,7 +85,7 @@ object VerblobDevRandomRowGenerator {
     }
   }
 
-  def dummyGenerator(l: Int): Row = {
+  def dummyGenerator(l: Long): Row = {
     val rnd = Random
     val v1 = (100000000 + rnd.nextInt(450000000) + 1).toString
     val v2 = (rnd.nextInt(2780) + 1).toString
@@ -115,7 +115,7 @@ object VerblobDevRandomRowGenerator {
     Row(v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23, v24)
   }
 
-  def dummyGeneratorWithNulls(l: Int): Row = {
+  def dummyGeneratorWithNulls(l: Long): Row = {
     val rnd = Random
     val v1 = if (rnd.nextInt(10) == 0) null else (100000000 + rnd.nextInt(450000000) + 1).toString
     val v2 = if (rnd.nextInt(10) == 0) null else (rnd.nextInt(2780) + 1).toString
